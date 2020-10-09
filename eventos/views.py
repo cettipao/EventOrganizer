@@ -4,4 +4,4 @@ from django.http import HttpResponse
 # Create your views here.
 
 def flyerView(request):
-    return HttpResponse("Hola Mundo")
+    return render(request, "home.html", {})
