@@ -25,18 +25,20 @@ SECRET_KEY = ')-89-a4&%0-103#eb6r^*t)rz0i#_&+w2=tt14)*1y75%4%+x6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
-# Application definition
+# Application definitionhttps://github.com/cettipao/ProyectoFinal.git
 
 INSTALLED_APPS = [
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'eventos',
 ]
 
 MIDDLEWARE = [
