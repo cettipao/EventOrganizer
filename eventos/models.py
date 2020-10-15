@@ -17,5 +17,5 @@ class Invitado(models.Model):
     confirmado = models.BooleanField(default = False)
     cambio_nombre = models.BooleanField(default=False)
 
-    def str(self):
+    def __str__(self):
         return "{}, {}".format(self.numero, self.nombre)

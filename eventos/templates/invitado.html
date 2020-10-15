@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    {% load static %}
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invitado</title>
+</head>
+
+<body style="background-color: white">
+
+      <nav>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo right">Invitado</a>
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <li><a href="http://127.0.0.1:8000/admin">Ir al Admin</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+         <div class="row">
+
+        <div class="col s0 m2 l2">
+            <!-- Note that "m4 l3" was added -->
+            <!-- Grey navigation panel
+
+                    This content will be:
+                3-columns-wide on large screens,
+                4-columns-wide on medium screens,
+                12-columns-wide on small screens  -->
+
+        </div>
+
+        <div class="col s12 m8 l8">
+            <!-- Note that "m8 l9" was added -->
+            <!-- Teal page content
+
+                    This content will be:
+                9-columns-wide on large screens,
+                8-columns-wide on medium screens,
+                12-columns-wide on small screens  -->
+
+
+      <div class="card-panel white">
+        <h3 class="center">{{ nombre }}</h3>
+          <h5><b>Numero:</b> {{ numero }}</h5>
+          <h5><b>Sexo:</b> {{ sexo }}</h5>
+      </div>
+
+
+        </div>
+
+
+        </div>
+        <div class="col s0 m2 l2">
+            <!-- Note that "m4 l3" was added -->
+            <!-- Grey navigation panel
+
+                      This content will be:
+                  3-columns-wide on large screens,
+                  4-columns-wide on medium screens,
+                  12-columns-wide on small screens  -->
+
+        </div>
+
+
+
+
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+    <!--Mis funciones .js-->
+</body>
+
+</html>
