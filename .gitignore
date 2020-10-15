@@ -3,10 +3,6 @@
 db.sqlite3
 /*/migrations/**
 !/*/migrations/__init__.py
-!static/
-static/*
-media/*/**
-!media/*/default.png
 # manage.py
 
 # Byte-compiled / optimized / DLL files
