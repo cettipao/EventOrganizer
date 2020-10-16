@@ -9,7 +9,7 @@ from config.settings import BASE_DIR
 def genImage(nombre,id,host,num):
     logo = qrcode.make('http://' + host + '/invitado/' + num)
     logo = logo.resize((380, 380))
-    logo = logo.crop((25, 25, 360, 360))
+    logo = logo.crop((21, 23, 360, 360))
 
     img = Image.open(BASE_DIR + '/static/' + "flyer.png")
     # Escribe el Nombre
