@@ -48,28 +48,29 @@ def smsView(request):
         invitado = Invitado.objects.get(numero=num)
         if invitado.confirmado:
             if invitado.cambio_nombre:
+                msg_media = Message()
+                # Imagen
+                nombreImagen = genImage(invitado.nombre, str(invitado.id), request.get_host(), str(invitado.numero))
+                msg_media.media('http://' + request.get_host() + '/static/invitaciones/' + nombreImagen)
+                r = MessagingResponse()
+                r.nest(msg_media)
                 invitado.nombre = request.POST.get('Body')
                 invitado.cambio_nombre = False
                 invitado.save()
                 msg = "Nombre cambiado a *{}* exitosamente".format(request.POST.get(
                     'Body')) + '\n\n*Nota*: La tarjeta anterior queda invalida\n\n(Ingrese cualquier cosa para ver acciones)'
-                r = MessagingResponse()
-                msg_media = Message()
                 msg_media.body(msg)
-                # Imagen
-                nombreImagen = genImage(invitado.nombre, str(invitado.id))
-                msg_media.media('http://' + request.get_host() + '/static/invitaciones/' + nombreImagen)
-                r.nest(msg_media)
+
                 # msg_media = r.message(msg)
                 return r
             elif request.POST.get('Body') == "1":
                 r = MessagingResponse()
                 msg_media = Message()
-                msg_media.body('(Ingrese cualquier cosa para ver acciones)')
                 # Imagen
-                nombreImagen = genImage(invitado.nombre, str(invitado.id))
+                nombreImagen = genImage(invitado.nombre, str(invitado.id), request.get_host(), str(invitado.numero))
                 msg_media.media('http://' + request.get_host() + '/static/invitaciones/' + nombreImagen)
                 r.nest(msg_media)
+                msg_media.body('(Ingrese cualquier cosa para ver acciones)')
                 # msg_media = r.message(msg)
                 return r
 
