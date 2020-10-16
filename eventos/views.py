@@ -38,12 +38,12 @@ def smsView(request):
 
     # deleteImgs()
     num = request.POST.get('From')
+    if request.POST.get('From') is None:
+        r = MessagingResponse()
+        r.message("No Number")
+        return r
     num = num[9::]
     if len(Invitado.objects.all().filter(numero=num)) == 0:
-        if request.POST.get('From') is None:
-            r = MessagingResponse()
-            r.message("No Number")
-            return r
         invitado = Invitado.objects.create(numero=str(num), nombre=request.POST.get('Body'))
         msg = "¿{} *{}*? \n \n -Si \n -No".format(confirmacion, request.POST.get('Body'))
     else:
