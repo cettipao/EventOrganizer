@@ -5,6 +5,7 @@ from django_twilio.decorators import twilio_view
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from .imageGenerator import genImage, deleteImgs
 from .models import *
+import asyncio
 
 
 # Create your views here.
@@ -24,6 +25,7 @@ def adminView(request):
     numHombres = len(Invitado.objects.filter(sexo="H"))
     numMujeres = len(Invitado.objects.filter(sexo="M"))
     return render(request, 'admin.html', {'invitados': invitados, 'hombres': numHombres, 'mujeres': numMujeres})
+
 
 
 @twilio_view
@@ -48,6 +50,18 @@ def smsView(request):
         invitado = Invitado.objects.get(numero=num)
         if invitado.confirmado:
             if invitado.cambio_nombre:
+                invitado.nombre = request.POST.get('Body')
+                invitado.cambio_nombre = False
+                invitado.save()
+                nombreImagen = genImage(invitado.nombre, str(invitado.id), request.get_host(), str(invitado.numero))
+                msg = 'Entrada: http://' + request.get_host() + '/static/invitaciones/' + nombreImagen
+                msg += "\n\nNombre cambiado a *{}* exitosamente".format(request.POST.get(
+                    'Body')) + '\n\n*Nota*: La tarjeta anterior queda invalida\n\n(Ingrese cualquier cosa para ver acciones)'
+                r = MessagingResponse()
+                r.message(msg)
+                return r
+
+                """
                 msg_media = Message()
                 # Imagen
                 nombreImagen = genImage(invitado.nombre, str(invitado.id), request.get_host(), str(invitado.numero))
@@ -63,7 +77,15 @@ def smsView(request):
 
                 # msg_media = r.message(msg)
                 return r
+                """
             elif request.POST.get('Body') == "1":
+                nombreImagen = genImage(invitado.nombre, str(invitado.id), request.get_host(), str(invitado.numero))
+                msg = 'Entrada: http://' + request.get_host() + '/static/invitaciones/' + nombreImagen + '\n\n(Ingrese cualquier cosa para ver acciones)'
+                r = MessagingResponse()
+                r.message(msg)
+                return r
+
+                """
                 r = MessagingResponse()
                 msg_media = Message()
                 # Imagen
@@ -73,7 +95,7 @@ def smsView(request):
                 msg_media.body('(Ingrese cualquier cosa para ver acciones)')
                 # msg_media = r.message(msg)
                 return r
-
+                """
             elif request.POST.get('Body') == "2":
                 msg = "Por favor, ingrese su nombre a cambiar:"
                 invitado.cambio_nombre = True

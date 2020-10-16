@@ -35,12 +35,12 @@ def genImage(nombre,id,host,num):
     img.paste(logo, (370, 1075), logo)
 
     # guarda
-    f = open(BASE_DIR + '/static/invitaciones/' + str(id) +nombre + '.png', 'wb')
+    f = open(BASE_DIR + '/static/invitaciones/' + num + '.png', 'wb')
 
     img.save(f)
     f.close()
 
-    return "{}{}.png".format(str(id),nombre)
+    return "{}.png".format(num)
 
 def deleteImgs():
     folder = BASE_DIR + '/static/invitaciones/'
