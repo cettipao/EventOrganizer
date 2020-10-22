@@ -1,33 +1,129 @@
 import os
+
 from django.shortcuts import render
-from django.http import HttpResponse
+from config.settings import BASE_DIR
 from django_twilio.decorators import twilio_view
-from twilio.twiml.messaging_response import MessagingResponse, Message
+from twilio.twiml.messaging_response import MessagingResponse,Message
+from .models import Invitado
 from .imageGenerator import genImage, deleteImgs
-from .models import *
-import asyncio
+from .excelGenerator import genExcel
+import json
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
+"""
+flyerView
+Renderiza la pagina promocion del evento, sin ninguna logica
 
+No toma parametros adicionales por url
+"""
 def flyerView(request):
     return render(request, "home.html", {})
 
+"""
+downloadView
+Busca todos los invitados y mediante genExcel devuelve un .xlsx con los mismos
 
-def invitadoView(request, inv):
-    invitado = Invitado.objects.get(numero=inv)
-    return render(request, "invitado.html",
-                  {"nombre": invitado.nombre, "numero": invitado.numero, "sexo": invitado.sexo})
+No toma parametros adicionales por url
+"""
+def downloadView(request):
+    invitados = Invitado.objects.all() #Busca invitados
+    genExcel(invitados) #Genera el Excel
+    file_path = BASE_DIR + '/static/' + 'InvitadosEvento.xlsx' #Busca el excel generado
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404 #Devuelve el excel
 
+"""
+InvitadoView
+- Muestra una tarjeta virtual del invitado.
+- En modo superusuario al acceder, automaticamente el invitado pasa a estar adentro del evento
+    (Patovica con cuenta superuser escanea el QR)
+- En modo superusuario y /config permite cambiar el sexo y eliminar el invitado
 
+Toma num (numero telefonico del invitado como ID)
+Toma conf (Verifica si esta /conf y superusuario para mostrar configuraciones)
+"""
+def invitadoView(request, num, conf=None):
+    ingreso = False
+    ingresoCancelado = False
+    invitado = get_object_or_404(Invitado, numero=num)
+    if request.user.is_superuser and not(conf == "config"): #Modo para cambiar a adentro al invitado
+        ingreso = True
+        invitado.adentro = True #el estado de adentro pasa a ser True
+    if not(request.user.is_superuser) or not(conf == "config"): #Modo "normal"
+        conf = None
+    if request.method == "POST":
+        if ("cancelarAdentro" in request.POST) and (request.user.is_superuser) and (conf == "config"):
+            Invitado.objects.get(numero=request.POST.get("cancelarAdentro")).adentro = False
+            ingresoCancelado = True #En caso de que el patovica haya escaneado por error, puede cancelar el adentro
+    elif "sexo" in request.GET: #Cambio de Sexo mediante Ajax
+        oldSexo = request.GET.get("sexo")
+        print(oldSexo)
+        if oldSexo == "H":
+            invitado.sexo = "M"
+        else:
+            invitado.sexo = "H"
+        print(invitado.sexo)
+        invitado.save() #Guardo nuevo Sexo
+        return HttpResponse(json.dumps({"sexo": invitado.sexo}), content_type="application/json") #Devuelvo AjaxRequest
+    return render(request, 'invitado.html', {"invitado": invitado, "ingreso": ingreso,
+                                             "conf": conf, "host": request.get_host(),
+                                             "ingresoCancelado": ingresoCancelado})
+
+"""
+adminView
+Solo si entras desde una cuenta admin, permite:
+- Ver invitados
+- Acceder a su wpp
+- Ver cantidad de hombres/mujeres
+- Añadir invitado
+
+No toma parametros adicionales por url
+"""
 def adminView(request):
+    if not(request.user.is_superuser): #Si no estas logueado como superuser no accedes al admin
+        return render(request, "denied.html", {"host": request.get_host()})
+    newInvitado = None
+    deleteInvitado = None
+    if request.method == "POST": #Verifica si desde el invitado/config fue direccionado a esta pag para eliminar
+        if "eliminar" in request.POST:
+            if len(Invitado.objects.filter(numero=request.POST.get("eliminar"))) != 0:
+                invitado = Invitado.objects.get(numero=request.POST.get("eliminar"))
+                deleteInvitado = invitado.nombre
+                invitado.delete() #Accede al invitado y lo elimina
+        else: #Sino, como accede por post es que va a crear un nuevo invitado (Redirrecciono a la misma pag para no usar ajax)
+            nombre = request.POST.get("nombre")
+            telefono = request.POST.get("telefono")
+            sexo = request.POST.get("sexo")
+            if len(Invitado.objects.filter(numero=telefono)) == 0:
+                newInvitado = Invitado.objects.create(numero=telefono, nombre=nombre, sexo=sexo)
+                #Toma los datos pasados por POST y crea el invitado
+
     invitados = Invitado.objects.all()
     numHombres = len(Invitado.objects.filter(sexo="H"))
     numMujeres = len(Invitado.objects.filter(sexo="M"))
-    return render(request, 'admin.html', {'invitados': invitados, 'hombres': numHombres, 'mujeres': numMujeres})
+    return render(request, 'admin.html', {'invitados': invitados, 'hombres': numHombres, 'mujeres': numMujeres,
+                                         "host": request.get_host(), "newInvitado": newInvitado,
+                                         "delInvitado": deleteInvitado
+                                         })
 
+"""
+smsView
+Realiza las logicas para comunicarse con el wppBot
+- Crea invitados
+- Ofrece asistencia a los invitados como:
+    * Pedir su entrada
+    * Cambiar su nombre
+    * Confirmar inasistencia
 
-
+No toma parametros adicionales por url
+"""
 @twilio_view
 def smsView(request):
     confirmacion = "Confirmar asistencia al evento en nombre de"

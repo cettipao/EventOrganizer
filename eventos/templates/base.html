@@ -1,35 +1,40 @@
+{# Pagina de Base, importa materialize y arma la estructura HTML #}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js%22%3E</script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    {% load static %}
+    {% load static %}  {# Cargo archivos estaticos #}
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'css-m/materialize.min.css' %}" media="screen,projection"/>
 
     <!--Let browser know website is optimized for mobile-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}
 
-        {% endblock %}</title>
+    {% endblock %}</title>
 </head>
 
 <body style="background-color: white">
-    {% include 'navbar.html' %}
-    {% block content %}
 
-    {% endblock %}
+{% block content %}
 
-    <!--JavaScript at end of body for optimized loading-->
-    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
-    <!--Mis funciones .js-->
-    <script src="{% static 'funciones.js' %}"></script>
+{% endblock %}
+
+<!--JavaScript at end of body for optimized loading-->
+<script type="text/javascript" src="{% static 'js-m/materialize.min.js' %}"></script>
+<script>  {# Activo por JS los modals #}
+$(document).ready(function () {
+    $('.modal').modal();
+});
+</script>
 </body>
 
 </html>
