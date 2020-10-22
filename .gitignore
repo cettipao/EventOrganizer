@@ -1,6 +1,5 @@
 #Para django:
 .directory
-db.sqlite3
 /*/migrations/**
 !/*/migrations/__init__.py
 # manage.py
