@@ -1,18 +1,19 @@
+{# Fragmento de HTML que importa admin para su navbar #}
+{# Crea models clasificando por sexo y para añadir invitado #}
 <nav>
     <div class="nav-wrapper purple">
-        <a href="/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
-        <a href="/" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
+        <a href="//{{ host }}/administrador/" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 
         <ul class="left hide-on-med-and-down">
             <li><a href="#modalHombres" class="modal-trigger">Ver Hombres</a></li>
             <li><a href="#modalMujeres" class="modal-trigger">Ver Mujeres</a></li>
-            <li><a href="">Acerca De</a></li>
-            <li><a href="">Desarrollo</a></li>
+            <li><a href="#modalAdd" class="modal-trigger">Add Invitado</a></li>
         </ul>
     </div>
 </nav>
 
-<script>
+<script>  {# Activo la navbar de hamburguesa para mobile #}
     $(document).ready(function () {
         $('.sidenav').sidenav();
     });
@@ -31,10 +32,11 @@
             </thead>
 
             <tbody>
-            {% for invitado in invitados %}
+            {% for invitado in invitados %}  {# For para generar lista de invitados hombres #}
                 <tr>
                     {% if invitado.sexo == "H" %}
-                        <td>{{ invitado.nombre }}</td>
+                        <td><a class="black-text"
+                               href="//{{ host }}/invitado/{{ invitado.numero }}/config/">{{ invitado.nombre }}</a></td>
                         <td><a href="https://wa.me/{{ invitado.numero }}/"
                                class="btn-floating btn-small waves-effect waves-light white"><i
                                 class="material-icons green-text">message</i></a></td>
@@ -65,10 +67,11 @@
             </thead>
 
             <tbody>
-            {% for invitado in invitados %}
+            {% for invitado in invitados %}  {# For para generar lista de invitados mujeres #}
                 <tr>
                     {% if invitado.sexo == "M" %}
-                        <td>{{ invitado.nombre }}</td>
+                        <td><a class="black-text"
+                               href="//{{ host }}/invitado/{{ invitado.numero }}/config/">{{ invitado.nombre }}</a></td>
                         <td><a href="https://wa.me/{{ invitado.numero }}/"
                                class="btn-floating btn-small waves-effect waves-light white"><i
                                 class="material-icons green-text">message</i></a></td>
@@ -86,6 +89,50 @@
     </div>
 </div>
 
+<!-- Modal Structure #ModalAdd -->
+<div id="modalAdd" class="modal modal-fixed-footer" style="background-color: white;">
+    <div class="modal-content">
+        <h4>Agregar Invitado</h4>
+        <div class="row">
+            <form method="post">  {# Formulario añadir invitado #}
+                {% csrf_token %}  {# Etiqueta de seguridad django #}
+                <div class="row">
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input id="icon_prefix" type="text" class="validate" name="nombre">
+                        <label for="icon_prefix">Nombre</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field">
+                        <i class="material-icons prefix">phone</i>
+                        <input id="icon_telephone" type="tel" class="validate" value="+549" name="telefono">
+                        <label for="icon_telephone">Telefono (+54 9 XXX XXX XXXX)</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <label>
+                        <input name="sexo" type="radio" value="H" class="col 6"/>
+                        <span>Hombre</span>
+                    </label>
+                    <label>
+                        <input name="sexo" type="radio" value="M" class="col 6"/>
+                        <span>Mujer</span>
+                    </label>
+                </div>
+
+        </div>
+
+
+    </div>
+    <div class="modal-footer" style="background-color: white;">
+        <a class="modal-close waves-effect waves-green btn-flat">Cerrar</a>
+        <button class="btn waves-effect waves-light" type="submit">Agregar
+            <i class="material-icons right">send</i>
+            </form>
+        </button>
+    </div>
+</div>
 
 
 <ul id="slide-out" class="sidenav" style="background-color: white" ;>
@@ -98,16 +145,14 @@
         </div>
     </li>
     <li><a href="#modalHombres" class="modal-trigger"><i class="material-icons"
-                      style="font-size: 2.5rem;">wc</i>Ver Hombres</a></li>
+                                                         style="font-size: 2.5rem;">wc</i>Ver Hombres</a></li>
     <li><a href="#modalMujeres" class="modal-trigger"><i class="material-icons"
-                      style="font-size: 2.5rem;">wc</i>Ver Mujeres</a></li>
+                                                         style="font-size: 2.5rem;">wc</i>Ver Mujeres</a></li>
     <li>
         <div class="divider"></div>
     </li>
-    <li><a onclick="alert('No disponible')"><i class="material-icons"
-                      style="font-size: 2.5rem;">person_add</i>Add Invitado</a></li>
-    <li><a onclick="alert('No disponible')"><i class="material-icons"
-                                              style="font-size: 2.5rem;">person_outline</i>Remove Invitado</a></li>
+    <li><a href="#modalAdd" class="modal-trigger"><i class="material-icons"
+                                                     style="font-size: 2.5rem;">person_add</i>Add Invitado</a></li>
     <li>
         <div class="divider"></div>
     </li>

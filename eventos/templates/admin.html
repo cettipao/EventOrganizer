@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Administrador
+{% endblock %}
+
+{% block content %}
+{% include 'navbar.html' %}
+{% if newInvitado is not None %}
+    <script>
+     M.toast({html: '{{ newInvitado.nombre }} agregado con exito!', classes: 'rounded'});
+    </script>
+{% endif %}
+    {% if delInvitado is not None %}
+    <script>
+     M.toast({html: '{{ delInvitado }} eliminado con exito!', classes: 'rounded'});
+    </script>
+{% endif %}
+    <!-- Page Layout here -->
+    <div class="fixed-action-btn">
+  <a class="btn-floating btn-large purple" href="/download">
+    <i class="large material-icons">file_download</i>
+  </a>
+</div>
+
+
+    <div class="row">
+
+        <div class="col s0 m2 l2">
+            <!-- Note that "m4 l3" was added -->
+            <!-- Grey navigation panel
+
+                    This content will be:
+                3-columns-wide on large screens,
+                4-columns-wide on medium screens,
+                12-columns-wide on small screens  -->
+
+        </div>
+
+        <div class="col s12 m8 l8">
+            <!-- Note that "m8 l9" was added -->
+            <!-- Teal page content
+
+                    This content will be:
+                9-columns-wide on large screens,
+                8-columns-wide on medium screens,
+                12-columns-wide on small screens  -->
+
+
+            <div class="card-panel white">
+
+
+                <h5>Invitados ({{ invitados.count }})</h5>
+
+                <div class="divider"></div>
+
+                 <table class="centered striped">
+        <thead>
+          <tr>
+              <th>Nombre</th>
+              <th>WhatsApp</th>
+              <th>Sexo</th>
+          </tr>
+        </thead>
+
+        <tbody>
+            {% for invitado in invitados %}
+          <tr>
+            <td><a class="black-text" href="//{{ host }}/invitado/{{ invitado.numero }}/config/">{{ invitado.nombre }}</a></td>
+            <td><a href="https://wa.me/{{ invitado.numero }}/" class="btn-floating btn-small waves-effect waves-light white"><i class="material-icons green-text">message</i></a></td>
+            <td> <div id="btnSexo">
+                {% if invitado.sexo == "H" %}
+                <a class="btn-floating btn-small waves-effect waves-light light-blue">H</a></td>
+                {% elif invitado.sexo == 'M' %}
+                <a class="btn-floating btn-small waves-effect waves-light pink accent-2">M</a></td>
+                {% else %}
+                <a class="btn-floating btn-small waves-effect waves-light white"></a></td>
+            {% endif %}
+            </div>
+            </td>
+          </tr>
+        {% endfor %}
+
+        </tbody>
+      </table>
+
+            </div>
+
+
+        </div>
+        <div class="col s0 m2 l2">
+            <!-- Note that "m4 l3" was added -->
+            <!-- Grey navigation panel
+
+                      This content will be:
+                  3-columns-wide on large screens,
+                  4-columns-wide on medium screens,
+                  12-columns-wide on small screens  -->
+
+        </div>
+{% endblock %}
