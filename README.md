@@ -86,6 +86,7 @@ git clone https://github.com/cettipao/ProyectoFinal.git
 * [Materialize](https://materializecss.com/)
 * [JavaScript](https://www.javascript.com/)
 * [AJAX](https://api.jquery.com/jquery.ajax/)
+* [Bootstrap](https://getbootstrap.com/)
 # License
 
 Bajo el Colegio [ITS Villada](https://www.itsv.edu.ar/)
