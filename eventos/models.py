@@ -12,8 +12,8 @@ class Mesa(models.Model):
     isInfantil.boolean = infantil
     isInfantil.short_description = 'Mesa de Niños'
 
-    def str(self):
-        return str(self.numero_mesa)
+    def __str__(self):
+        return "{}".format(self.numero_mesa)
 
 class Invitado(models.Model):
     numero = models.CharField(max_length=30)
@@ -36,7 +36,7 @@ class Invitado(models.Model):
     confirmado = models.BooleanField(default = False)
     cambio_nombre = models.BooleanField(default=False)
 
-    def str(self):
+    def __str__(self):
         return "{}, {}".format(self.numero, self.nombre)
 
 class Ingreso(models.Model):
@@ -47,5 +47,5 @@ class Ingreso(models.Model):
     )
     hora = models.DateTimeField(auto_now=True)
 
-    def str(self):
+    def __str__(self):
         return "{}, {}".format(self.invitado.nombre, self.hora.ctime())

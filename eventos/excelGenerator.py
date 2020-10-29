@@ -11,9 +11,14 @@ def genExcel(invitados):
 
     hoja1['A1'] = "Nombre"
     hoja1['B1'] = "Numero"
+    hoja1['C1'] = "Mesa"
 
     for i in range(len(invitados)):
         hoja1['A' + str(i+2)] = invitados[i].nombre
         hoja1['B' + str(i+2)] = invitados[i].numero
+        if invitados[i].mesa is not None:
+            hoja1['C' + str(i + 2)] = invitados[i].mesa.numero_mesa
+        else:
+            hoja1['C' + str(i + 2)] = "N/A"
 
     doc.save(BASE_DIR + '/static/' + 'InvitadosEvento.xlsx')

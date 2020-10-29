@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block content %}
-<nav>
-    <div class="nav-wrapper purple">
-        <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
-    </div>
-</nav>
+    <nav>
+        <div class="nav-wrapper purple">
+            <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
+        </div>
+    </nav>
 
     <div class="row">
 
@@ -35,6 +35,18 @@
                 12-columns-wide on small screens  -->
 
             <h1 class="center">Acceso Denegado</h1>
+
+            <div class="row">
+                <div class="col s1"></div>
+                <div class="col s10 center-align">
+                    <a href="//{{ host }}/admin/">
+                    <button class="center-align waves-effect waves-white btn-flat purple white-text">
+                        Iniciar Sesion
+                    </button>
+                        </a>
+                </div>
+                <div class="col s1"></div>
+            </div>
 
 
         </div>

@@ -2,15 +2,15 @@
 {% extends 'base.html' %}
 
 {% block title %}
-{{ invitado.nombre }}
+    {{ invitado.nombre }}
 {% endblock %}
 
 {% block content %}
-<nav>  {# Crea una navbar mas simple #}
-    <div class="nav-wrapper purple">
-        <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
-    </div>
-</nav>
+    <nav>  {# Crea una navbar mas simple #}
+        <div class="nav-wrapper purple">
+            <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
+        </div>
+    </nav>
 
     {% if conf == "config" %}  {# Si es superusuario y esta en /config aparece el boton de eliminar #}
 
@@ -27,7 +27,8 @@
                 <p>¿Seguro quieres eliminar a {{ invitado.nombre }}?</p>
             </div>
             <div class="modal-footer">
-                <form method="post" action="//{{ host }}/administrador/">  {# Form para eliminar al invitado redirije a /administrador #}
+                <form method="post" action="//{{ host }}/administrador/">
+                    {# Form para eliminar al invitado redirije a /administrador #}
                     {% csrf_token %}
                     <input type="hidden" name="eliminar" value="{{ invitado.numero }}">
                     <button type="submit" class="modal-close waves-effect waves-green btn-flat red white-text">
@@ -37,8 +38,9 @@
             </div>
         </div>
     {% endif %}
-    {% if ingresoCancelado %}  {# En caso de que se haya escaneado por error y el invitado este adentro. Se puede cancelar #}
-        <script>
+    {% if ingresoCancelado %}
+        {# En caso de que se haya escaneado por error y el invitado este adentro. Se puede cancelar #}
+        <script type="module">
             M.toast({html: 'Ingreso Cancelado con Exito!', classes: 'rounded'});
         </script>
     {% endif %}
@@ -65,7 +67,7 @@
                 12-columns-wide on small screens  -->
 
             <h1 class="center">Invitado Valido</h1>
-            {% if ingreso %}  {# El invitado ingresa exitosamente y el html avisa #}
+            {% if ingreso_exitoso %}  {# El invitado ingresa exitosamente y el html avisa #}
                 <div id="fuera" class="card-panel teal scale-transition scale-out">
                 <span class="white-text"><h5>Ingreso exitoso</h5>
                     <form method="post" action="//{{ host }}/invitado/{{ invitado.numero }}/config/">
@@ -78,6 +80,16 @@
                     document.getElementById("fuera").className += "scale-in"
                 </script>
             {% endif %}
+
+            {% if ingreso_existente %}  {# El invitado ya ha ingresado #}
+                <div id="fuera2" class="card-panel red scale-transition scale-out">
+                <span class="white-text"><h5>Invitado ya ingresado ({{ ingreso.hora }})</h5>
+                </div>
+                <script>
+                    document.getElementById("fuera2").className += "scale-in"
+                </script>
+            {% endif %}
+
             <div class="card-panel white">
 
                 <h5><b>Nombre</b>: {{ invitado.nombre }}</h5>
@@ -101,33 +113,44 @@
                         </button>
                     </form>
                     <script>  {# El cambio de sexo es un formulario con ajax #}
-                        $(document).ready(function () {
-                            $('#changeSexo').submit(function () { // catch the form's submit event
-                                $.ajax({ // create an AJAX call...
-                                    data: $(this).serialize(), // get the form data
-                                    type: $(this).attr('post'), // GET or POST
-                                    url: $(this).attr(''), // the file to call
-                                    success: function (response) { // on success
-                                        if (response.sexo == "H") {
-                                            document.getElementById("sex").value = "H"
-                                            document.getElementById('btnSexo').innerHTML = '<a class="btn-floating btn-small waves-effect waves-light light-blue">H</a></td>'
-                                        } else {
-                                            document.getElementById("sex").value = "M"
-                                            document.getElementById('btnSexo').innerHTML = '<a class="btn-floating btn-small waves-effect waves-light pink accent-2">M</a></td>'
-                                        }
-                                    },
-                                    error: function (e, x, r) { // on error..
-                                        alert("Error");
+                    $(document).ready(function () {
+                        $('#changeSexo').submit(function () { // catch the form's submit event
+                            $.ajax({ // create an AJAX call...
+                                data: $(this).serialize(), // get the form data
+                                type: $(this).attr('post'), // GET or POST
+                                url: $(this).attr(''), // the file to call
+                                success: function (response) { // on success
+                                    if (response.sexo == "H") {
+                                        document.getElementById("sex").value = "H"
+                                        document.getElementById('btnSexo').innerHTML = '<a class="btn-floating btn-small waves-effect waves-light light-blue">H</a></td>'
+                                    } else {
+                                        document.getElementById("sex").value = "M"
+                                        document.getElementById('btnSexo').innerHTML = '<a class="btn-floating btn-small waves-effect waves-light pink accent-2">M</a></td>'
                                     }
-                                });
-                                return false;
+                                },
+                                error: function (e, x, r) { // on error..
+                                    alert("Error");
+                                }
                             });
+                            return false;
                         });
+                    });
                     </script>
 
                 {% endif %}
 
-                <h5><b>Estado</b>: {% if invitado.adentro %} Adentro {% else %} Afuera {% endif %} </h5>
+                <h5><b>Ingreso</b>:
+                    {% if invitado.ingreso == "" %}
+                        No ingresado
+                    {% else %}
+                        {{ invitado.ingreso.hora }}
+                    {% endif %} </h5>
+                <h5><b>Mesa</b>:
+                    {% if invitado.mesa == None %}
+                        N/A
+                    {% else %}
+                        {{ invitado.mesa.numero_mesa }}
+                    {% endif %} </h5>
             </div>
 
 
@@ -142,10 +165,6 @@
                   12-columns-wide on small screens  -->
 
         </div>
-        <script>  {# Evita que los datos del POST se vuelvan a mandar al f5 #}
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-        </script>
+
 
 {% endblock %}

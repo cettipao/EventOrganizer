@@ -7,12 +7,12 @@
 {% block content %}
 {% include 'navbar.html' %}
 {% if newInvitado is not None %}
-    <script>
+    <script type="module">
      M.toast({html: '{{ newInvitado.nombre }} agregado con exito!', classes: 'rounded'});
     </script>
 {% endif %}
     {% if delInvitado is not None %}
-    <script>
+    <script type="module">
      M.toast({html: '{{ delInvitado }} eliminado con exito!', classes: 'rounded'});
     </script>
 {% endif %}
@@ -60,6 +60,7 @@
               <th>Nombre</th>
               <th>WhatsApp</th>
               <th>Sexo</th>
+              <th>Mesa</th>
           </tr>
         </thead>
 
@@ -76,7 +77,13 @@
                 {% else %}
                 <a class="btn-floating btn-small waves-effect waves-light white"></a></td>
             {% endif %}
-            </div>
+             <td>
+                 {% if invitado.mesa == None %}
+                 N/A
+                 {% else %}
+                 {{ invitado.mesa.numero_mesa }}
+                 {% endif %}
+                </td>
             </td>
           </tr>
         {% endfor %}

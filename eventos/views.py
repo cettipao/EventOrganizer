@@ -4,7 +4,7 @@ from django.shortcuts import render
 from config.settings import BASE_DIR
 from django_twilio.decorators import twilio_view
 from twilio.twiml.messaging_response import MessagingResponse,Message
-from .models import Invitado
+from .models import *
 from .imageGenerator import genImage, deleteImgs
 from .excelGenerator import genExcel
 import json
@@ -51,30 +51,36 @@ Toma conf (Verifica si esta /conf y superusuario para mostrar configuraciones)
 """
 def invitadoView(request, num, conf=None):
     ingreso = False
+    ingreso_existente = False
+    ingreso_exitoso = False
     ingresoCancelado = False
     invitado = get_object_or_404(Invitado, numero=num)
     if request.user.is_superuser and not(conf == "config"): #Modo para cambiar a adentro al invitado
-        ingreso = True
-        invitado.adentro = True #el estado de adentro pasa a ser True
+        if len(Ingreso.objects.filter(invitado=invitado)) != 0:
+            ingreso = Ingreso.objects.get(invitado=invitado)
+            ingreso_existente = True
+        else:
+            ingreso = Ingreso.objects.create(invitado=invitado)
+            ingreso_exitoso = True
+        #invitado.adentro = True #el estado de adentro pasa a ser True
     if not(request.user.is_superuser) or not(conf == "config"): #Modo "normal"
         conf = None
     if request.method == "POST":
         if ("cancelarAdentro" in request.POST) and (request.user.is_superuser) and (conf == "config"):
-            Invitado.objects.get(numero=request.POST.get("cancelarAdentro")).adentro = False
+            invitado = Invitado.objects.get(numero=request.POST.get("cancelarAdentro"))
+            Ingreso.objects.get(invitado=invitado).delete()
             ingresoCancelado = True #En caso de que el patovica haya escaneado por error, puede cancelar el adentro
     elif "sexo" in request.GET: #Cambio de Sexo mediante Ajax
         oldSexo = request.GET.get("sexo")
-        print(oldSexo)
         if oldSexo == "H":
             invitado.sexo = "M"
         else:
             invitado.sexo = "H"
-        print(invitado.sexo)
         invitado.save() #Guardo nuevo Sexo
         return HttpResponse(json.dumps({"sexo": invitado.sexo}), content_type="application/json") #Devuelvo AjaxRequest
-    return render(request, 'invitado.html', {"invitado": invitado, "ingreso": ingreso,
+    return render(request, 'invitado.html', {"invitado": invitado, "ingreso": ingreso, "ingreso_existente":ingreso_existente,
                                              "conf": conf, "host": request.get_host(),
-                                             "ingresoCancelado": ingresoCancelado})
+                                             "ingresoCancelado": ingresoCancelado, "ingreso_exitoso": ingreso_exitoso})
 
 """
 adminView
