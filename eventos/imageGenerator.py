@@ -7,7 +7,7 @@ import shutil
 from config.settings import BASE_DIR
 
 def genImage(nombre,id,host,num):
-    logo = qrcode.make('http://' + host + '/invitado/' + num)
+    logo = qrcode.make('http://' + host + '/invitado/' + num + "/")
     logo = logo.resize((380, 380))
     logo = logo.crop((21, 23, 360, 360))
 
