@@ -1,6 +1,9 @@
 import os
 
+from django.db.models import Q
 from django.shortcuts import render
+from django.views.generic import TemplateView
+
 from config.settings import BASE_DIR
 from django_twilio.decorators import twilio_view
 from twilio.twiml.messaging_response import MessagingResponse,Message
@@ -19,9 +22,15 @@ Renderiza la pagina promocion del evento, sin ninguna logica
 
 No toma parametros adicionales por url
 """
-def flyerView(request):
-    return render(request, "home.html", {})
-
+class HomeView(TemplateView):
+    template_name = 'home.html'
+"""
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['libros'] = Libro.objects.all()
+        context['revistas'] = Revista.objects.all()
+        return context
+"""
 """
 downloadView
 Busca todos los invitados y mediante genExcel devuelve un .xlsx con los mismos
@@ -36,8 +45,8 @@ def downloadView(request):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application")
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-            return response
-    raise Http404 #Devuelve el excel
+            return response #Devuelve el excel
+    raise Http404
 
 """
 InvitadoView
@@ -207,6 +216,7 @@ def smsView(request):
                 msg = "*Desconfirmacion Exitosa*\n\nVuelva a ingresar su nombre si desea volver a confirmar\n\n{}".format(
                     mensaje_final)
             elif request.POST.get('Body').lower() == "invitados":
+
                 invitados = []
                 for invitado in Invitado.objects.all():
                     invitados.append(invitado.nombre)
@@ -215,6 +225,45 @@ def smsView(request):
                 for i in range(len(invitados)):
                     invitados_str += "{}. {}\n".format((i + 1), invitados[i])
                 msg = invitados_str + '\n(Ingrese cualquier cosa para ver acciones)'
+
+
+            elif request.POST.get('Body').lower() == "ver mesa":
+                if invitado.mesa is None:
+                    msg = "No tienes mesa asignada"
+                else:
+                    invitados = []
+                    for invitado in Invitado.objects.filter(mesa=invitado.mesa):
+                        invitados.append(invitado.nombre)
+                    invitados.sort()
+                    invitados_str = '*Lista de invitados (mesa {})*\n'.format(invitado.mesa.numero_mesa)
+                    for i in range(len(invitados)):
+                        invitados_str += "{}. {}\n".format((i + 1), invitados[i])
+                    msg = invitados_str + '\n(Ingrese cualquier cosa para ver acciones)'
+            elif request.POST.get('Body').lower() == "ver mesa hombres":
+                if invitado.mesa is None:
+                    msg = "No tienes mesa asignada"
+                else:
+                    invitados = []
+                    for invitado in Invitado.objects.filter(Q(mesa=invitado.mesa) & Q(sexo="H")):
+                        invitados.append(invitado.nombre)
+                    invitados.sort()
+                    invitados_str = '*Lista de invitados hombres (mesa {})*\n'.format(invitado.mesa.numero_mesa)
+                    for i in range(len(invitados)):
+                        invitados_str += "{}. {}\n".format((i + 1), invitados[i])
+                    msg = invitados_str + '\n(Ingrese cualquier cosa para ver acciones)'
+
+            elif request.POST.get('Body').lower() == "ver mesa mujeres":
+                if invitado.mesa is None:
+                    msg = "No tienes mesa asignada"
+                else:
+                    invitados = []
+                    for invitado in Invitado.objects.filter(Q(mesa=invitado.mesa) & Q(sexo="M")):
+                        invitados.append(invitado.nombre)
+                    invitados.sort()
+                    invitados_str = '*Lista de invitados mujeres (mesa {})*\n'.format(invitado.mesa.numero_mesa)
+                    for i in range(len(invitados)):
+                        invitados_str += "{}. {}\n".format((i + 1), invitados[i])
+                    msg = invitados_str + '\n(Ingrese cualquier cosa para ver acciones)'
             else:
                 msg = "*Acciones Disponibles*\n(Ingrese el numero de accion a realizar) " \
                       "\n \n1. Pedir entrada \n2. Cambiar nombre \n3. Desconfirmar asistencia " \
