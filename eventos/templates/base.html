@@ -29,10 +29,13 @@
 
 <!--JavaScript at end of body for optimized loading-->
 <script type="text/javascript" src="{% static 'js-m/materialize.min.js' %}"></script>
-<script>  {# Activo por JS los modals #}
+<script>  {# Activo por JS los modals  y selects#}
 $(document).ready(function () {
     $('.modal').modal();
 });
+ $(document).ready(function(){
+    $('select').formSelect();
+  });
 </script>
 </body>
 

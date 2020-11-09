@@ -53,7 +53,7 @@ InvitadoView
 - Muestra una tarjeta virtual del invitado.
 - En modo superusuario al acceder, automaticamente el invitado pasa a estar adentro del evento
     (Patovica con cuenta superuser escanea el QR)
-- En modo superusuario y /config permite cambiar el sexo y eliminar el invitado
+- En modo superusuario y /config permite cambiar el sexo, mesa y eliminar el invitado
 
 Toma num (numero telefonico del invitado como ID)
 Toma conf (Verifica si esta /conf y superusuario para mostrar configuraciones)
@@ -87,8 +87,13 @@ def invitadoView(request, num, conf=None):
             invitado.sexo = "H"
         invitado.save() #Guardo nuevo Sexo
         return HttpResponse(json.dumps({"sexo": invitado.sexo}), content_type="application/json") #Devuelvo AjaxRequest
+    elif "mesa" in request.GET: #Cambio de Sexo mediante Ajax
+        mesa = request.GET.get("mesa")
+        invitado.mesa = Mesa.objects.get(numero_mesa=int(mesa))
+        invitado.save()
+        return HttpResponse(json.dumps({"mesa":invitado.mesa.numero_mesa}), content_type="application/json")
     return render(request, 'invitado.html', {"invitado": invitado, "ingreso": ingreso, "ingreso_existente":ingreso_existente,
-                                             "conf": conf, "host": request.get_host(),
+                                             "conf": conf, "host": request.get_host(), "mesas": Mesa.objects.all(),
                                              "ingresoCancelado": ingresoCancelado, "ingreso_exitoso": ingreso_exitoso})
 
 """
@@ -101,7 +106,7 @@ Solo si entras desde una cuenta admin, permite:
 
 No toma parametros adicionales por url
 """
-def adminView(request):
+def configView(request):
     if not(request.user.is_superuser): #Si no estas logueado como superuser no accedes al admin
         return render(request, "denied.html", {"host": request.get_host()})
     newInvitado = None
@@ -123,10 +128,10 @@ def adminView(request):
     invitados = Invitado.objects.all()
     numHombres = len(Invitado.objects.filter(sexo="H"))
     numMujeres = len(Invitado.objects.filter(sexo="M"))
-    return render(request, 'admin.html', {'invitados': invitados, 'hombres': numHombres, 'mujeres': numMujeres,
+    return render(request, 'config.html', {'invitados': invitados, 'hombres': numHombres, 'mujeres': numMujeres,
                                          "host": request.get_host(), "newInvitado": newInvitado,
                                          "delInvitado": deleteInvitado
-                                         })
+                                           })
 
 """
 smsView

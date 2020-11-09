@@ -8,7 +8,7 @@
 {% block content %}
     <nav>  {# Crea una navbar mas simple #}
         <div class="nav-wrapper purple">
-            <a href="//{{ host }}/administrador/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
+            <a href="//{{ host }}/config/" class="brand-logo right" style="padding-right: 3%;">Event Manager</a>
         </div>
     </nav>
 
@@ -27,8 +27,8 @@
                 <p>¿Seguro quieres eliminar a {{ invitado.nombre }}?</p>
             </div>
             <div class="modal-footer">
-                <form method="post" action="//{{ host }}/administrador/">
-                    {# Form para eliminar al invitado redirije a /administrador #}
+                <form method="post" action="//{{ host }}/config/">
+                    {# Form para eliminar al invitado redirije a /config #}
                     {% csrf_token %}
                     <input type="hidden" name="eliminar" value="{{ invitado.numero }}">
                     <button type="submit" class="modal-close waves-effect waves-green btn-flat red white-text">
@@ -145,12 +145,57 @@
                     {% else %}
                         {{ invitado.ingreso.hora }}
                     {% endif %} </h5>
-                <h5><b>Mesa</b>:
-                    {% if invitado.mesa == None %}
-                        N/A
-                    {% else %}
-                        {{ invitado.mesa.numero_mesa }}
-                    {% endif %} </h5>
+                <h5><b>Mesa</b>:</h5>
+
+                <script>  {# El cambio de sexo es un formulario con ajax #}
+
+                function getCookie(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+
+                function changeMesa() {
+                    const csrftoken = getCookie('csrftoken');
+                    $.ajax({ // create an AJAX call...
+                        headers: {'X-CSRFToken': csrftoken},
+                        data: {mesa: document.getElementById("mesaChoice").value},
+                        type: "GET", // GET or POST
+                        url: "", // the file to call
+
+                        success: function (response) { // on success
+                            M.toast({html: '{{invitado.nombre}} ahora esta en mesa '+response.mesa, classes: 'rounded'});
+                        },
+                        error: function (e, x, r) { // on error..
+                            alert("Error");
+                        }
+                    });
+                    return false;
+                }
+                </script>
+
+
+                <select onchange="changeMesa()" id="mesaChoice" name="mesa">
+                    {% if invitado.mesa is None %}
+                        <option value="" disabled selected>Elije mesa</option>
+                    {% endif %}
+                    {% for mesa in mesas %}
+                        <option value="{{ mesa.numero_mesa }}" {% if invitado.mesa == mesa %}selected{% endif %}>Mesa {{ mesa.numero_mesa }}</option>
+
+                    {% endfor %}
+                </select>
+                <label>Materialize Select</label>
+
             </div>
 
 

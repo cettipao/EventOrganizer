@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% block pretitle %}
+    <div id="footer"></div>
+    {% load static %}
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'css-m/materialize.min.css' %}" media="screen,projection"/>
+
+
+   <div class="card-panel blue">
+        <span class="white-text"> Esta pagina es exclusiva para desarrolladores, para ingresar a la configuracion del Staff, <a href="/config" style="color: lightgoldenrodyellow"><u>haga click acá</u></a>
+        </span>
+      </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large blue" href="/download">
+            <i class="large material-icons">file_download</i>
+        </a>
+    </div>
+
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="{% static 'js-m/materialize.min.js' %}"></script>
+
+{% endblock %}
+

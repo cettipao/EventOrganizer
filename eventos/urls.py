@@ -6,7 +6,7 @@ urlpatterns = [
     path('sms/', smsView),
     path('invitado/<str:num>/<str:conf>/', invitadoView),
     path('invitado/<str:num>/', invitadoView),
-    path('administrador/', adminView),
+    path('config/', configView),
     path('download/', downloadView),
 ]
 
